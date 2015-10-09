@@ -5,6 +5,8 @@
 BeginPackage["happyEngineering`"]
 (* Exported symbols added here with SymbolName::usage *) 
 
+clear::usage = "";
+SetCat::usage = "";
 NA::usage = "";
 (*CenterDot*)
 setCt::usage = "";
@@ -296,10 +298,10 @@ Ar[symbol_: Except@_ctSymbol, C_ctSymbol, opts___Rule] :=
 Ar[{dom_ob, cod_ob}, fn_fn, opts___Rule] := 
  Ar[{dom, cod}, fn, $workingCat, opts]
 Ar[{dom_ob, cod_ob}, _fn, \[DoubleStruckCapitalC]_ctSymbol, 
-   OptionsPattern[]] /; \[Not] (dom\[CenterDot]ct == 
-     cod\[CenterDot]ct == \[DoubleStruckCapitalC]) := 
- Message[Ar::unsameCt, dom\[CenterDot]ct, 
-  cod\[CenterDot]ct, \[DoubleStruckCapitalC]]
+   OptionsPattern[]] /; \[Not] (dom\[CenterDot]"ct" == 
+     cod\[CenterDot]"ct" == \[DoubleStruckCapitalC]) := 
+ Message[Ar::unsameCt, dom\[CenterDot]"ct", 
+  cod\[CenterDot]"ct", \[DoubleStruckCapitalC]]
 Ar::unsameCt = 
   "The ct of domain:'`1`', codomain'`2`', and of this arrow '`1`'  \
 must be the same.";
@@ -310,12 +312,12 @@ Ar[{dom_ob, cod_ob}, fn_fn, \[DoubleStruckCapitalC]_ctSymbol,
     "ct" -> \[DoubleStruckCapitalC], 
     "label" -> 
      automaticValue[OptionValue@"label", 
-      dom@"label" \[DirectedEdge] cod@"label"]], (dom\[CenterDot]object == 
+      dom@"label" \[DirectedEdge] cod@"label"]], (dom\[CenterDot]"object" == 
       fn\[CenterDot]"dom" \[And] 
-     cod\[CenterDot]object == fn\[CenterDot]"cod") \[Or] ((*areIn*)
-    SubsetEqual[dom\[CenterDot]object, 
+     cod\[CenterDot]"object" == fn\[CenterDot]"cod") \[Or] ((*areIn*)
+    SubsetEqual[dom\[CenterDot]"object", 
       fn\[CenterDot]"dom"] \[And](*areIn*)
-     SubsetEqual[cod\[CenterDot]object, fn\[CenterDot]"cod"])]
+     SubsetEqual[cod\[CenterDot]"object", fn\[CenterDot]"cod"])]
 (*Functor*)
 fr // ClearAll
 (*fr[ass_Association]@"ass":=ass*)
@@ -384,14 +386,14 @@ LongRightArrow // ClearAll
 LongRightArrow[A_ob] := A
 LongRightArrow~SetAttributes~{Flat, OneIdentity};
 legalQ // Clear
-legalQ[A_ob] := (A\[CenterDot]ct\[CenterDot]obQ)@A
-legalQ[f_ar] := (f\[CenterDot]ct\[CenterDot]arQ)@f
+legalQ[A_ob] := (A\[CenterDot]"ct"\[CenterDot]"obQ")@A
+legalQ[f_ar] := (f\[CenterDot]"ct"\[CenterDot]"arQ")@f
 legalQ[g_ar\[SmallCircle]f_ar, "sameCt"] := 
- g\[CenterDot]ct == f\[CenterDot]ct
+ g\[CenterDot]"ct" == f \[CenterDot]"ct"
 legalQ[g_ar\[SmallCircle]f_ar, "dc"] := 
- g\[CenterDot]dom == f\[CenterDot]cod
+ g\[CenterDot]"dom" == f\[CenterDot]"cod"
 legalQ[g_ar\[SmallCircle]f_ar, 
-  "composableQ"] := (f\[CenterDot]ct\[CenterDot]composableQ)[
+  "composableQ"] := (f\[CenterDot]"ct"\[CenterDot]"composableQ")[
   g\[SmallCircle]f]
 legalQ[g_ar\[SmallCircle]f_ar] := 
  If[legalQ[g\[SmallCircle]f, "sameCt"] \[And] 
@@ -401,65 +403,66 @@ legalQ[SmallCircle[g_ar, f_ar, fs__ar],
   PatternSequence[arg_String] | PatternSequence[]] := 
  legalQ[g\[SmallCircle]f, arg] \[And] legalQ[SmallCircle[f, fs], arg]
 legalQ[f_ar \[Colon] A_ob\[LongRightArrow]B_ob, "sameCt"] := 
- Equal @@ ({f, A, B}\[CenterDot]ct)
+ Equal @@ ({f, A, B}\[CenterDot]"ct")
 legalQ[f_ar \[Colon] A_ob\[LongRightArrow]B_ob] := 
  legalQ[f \[Colon] A\[LongRightArrow]B, 
-   "sameCt"] \[And] (f\[CenterDot]ct\[CenterDot]dcQ)[
+   "sameCt"] \[And] (f\[CenterDot]"ct"\[CenterDot]"dcQ")[
    f \[Colon] A\[LongRightArrow]B]
 legalQ[SmallCircle[gs___ar, g_ar, f_ar] \[Colon] 
    LongRightArrow[A_ob, B_ob, Cs___ob]] := 
  legalQ[g\[SmallCircle]f] \[And] 
   legalQ[f \[Colon] A\[LongRightArrow]B] \[And] 
   legalQ[SmallCircle[gs, g] \[Colon] LongRightArrow[B, Cs]]
-(*legalQ[f_ar[A_ob]]:=areIn[A\[CenterDot]object,f\[CenterDot]dom\
-\[CenterDot]object]\[And]Equal@@({f,A}\[CenterDot]ct)*)
+(*legalQ[f_ar[A_ob]]:=areIn[A\[CenterDot]"object",f\[CenterDot]"dom"\
+\[CenterDot]"object"]\[And]Equal@@({f,A}\[CenterDot]"ct")*)
 legalQ[f_ar[A_ob]] := 
- A\[CenterDot]object \[SubsetEqual] 
-   f\[CenterDot]dom\[CenterDot]object \[And] 
-  Equal @@ ({f, A}\[CenterDot]ct)
+ A\[CenterDot]"object" \[SubsetEqual] 
+   f\[CenterDot]"dom"\[CenterDot]"object" \[And] 
+  Equal @@ ({f, A}\[CenterDot]"ct")
 simplify // ClearAll
 simplify[f_ar\[SmallCircle]g_ar] := 
  If[legalQ[f\[SmallCircle]g], 
-  Ar[{g\[CenterDot]dom, f\[CenterDot]cod}, 
-   Fn[{g\[CenterDot]dom, 
-     f\[CenterDot]cod}, (f\[CenterDot]ct\[CenterDot]composeFunc)[
-     f\[SmallCircle]g]], f\[CenterDot]ct], False]
+  Ar[{g\[CenterDot]"dom", f\[CenterDot]"cod"}, 
+   Fn[{g\[CenterDot]"dom", 
+     f\[CenterDot]"cod"}, (f\[CenterDot]"ct"\[CenterDot]"composeFunc")[
+     f\[SmallCircle]g]], f\[CenterDot]"ct"], False]
 simplify[SmallCircle[f_ar, g_ar, gs__ar]] := 
  If[legalQ[f\[SmallCircle]g], 
   simplify@SmallCircle[simplify[f\[SmallCircle]g], gs], False]
 simplify[f_ar\[SmallCircle]g_ar[args__]] := 
- ConditionalExpression[(f\[CenterDot]ct\[CenterDot]\
-composeFuncWithArgs)[f\[SmallCircle]g[args]], 
+ ConditionalExpression[(f\[CenterDot]"ct"\[CenterDot]\
+"composeFuncWithArgs")[f\[SmallCircle]g[args]], 
   legalQ[f\[SmallCircle]g[args]]]
 simplify[f_ar[A_ob]] := 
  If[legalQ[f[A]], 
-  Ob[(f\[CenterDot]fn\[CenterDot]function)@(A\[CenterDot]object), 
-   f\[CenterDot]ct], False]
-simplify[f_ar[A_ob]] /; \[Not] f\[CenterDot]ct\[CenterDot]evalable := 
+  Ob[(f\[CenterDot]"fn"\[CenterDot]"function")@(A\[CenterDot]"object"), 
+   f\[CenterDot]"ct"], False]
+simplify[f_ar[A_ob]] /; \[Not] f\[CenterDot]"ct"\[CenterDot]"evalable" := 
  If[legalQ[f[A]], f[A], False]
 (*simplify[func_fn[A_ob]]:=If[legalQ[func[A]],Ob[(func\[CenterDot]\
-function)@(A\[CenterDot]object),func\[CenterDot]cod],False]*)
+"function")@(A\[CenterDot]"object"),func\[CenterDot]"cod"],False]*)
 simplify[F_fr[A_ob]] := 
- Ob[(F\[CenterDot]fnOb\[CenterDot]function)[A\[CenterDot]object], 
-  F\[CenterDot]cod]
-(*simplify[F_fr[f_ar]]:=Ar[(F\[CenterDot]fnAr\[CenterDot]function)[f\
-\[CenterDot]object],F\[CenterDot]cod]*)
-(*simplify[F_fr[f_ar]]:=Ar[{Ob[dom@#,F\[CenterDot]cod],Ob[cod@#,F\
-\[CenterDot]cod]},Fn[{dom@#,cod@#},#],F\[CenterDot]cod]&[(F\
-\[CenterDot]fnAr\[CenterDot]function)[f\[CenterDot]fn\[CenterDot]\
-function]]*)
+ Ob[(F\[CenterDot]"fnOb"\[CenterDot]"function")[A\[CenterDot]"object"], 
+  F\[CenterDot]"cod"]
+(*simplify[F_fr[f_ar]]:=Ar[(F\[CenterDot]"fnAr"\[CenterDot]"function")[f\
+\[CenterDot]"object"],F\[CenterDot]"cod"]*)
+(*simplify[F_fr[f_ar]]:=Ar[{Ob[dom@#,F\[CenterDot]"cod"],Ob[cod@#,F\
+\[CenterDot]"cod"]},Fn[{dom@#,cod@#},#],F\[CenterDot]"cod"]&[(F\
+\[CenterDot]"fnAr"\[CenterDot]"function")[f\[CenterDot]"fn"\[CenterDot]\
+"function"]]*)
 simplify[F_fr[f_ar]] := 
- Ar[#, Fn[#\[CenterDot]object, \
-(F\[CenterDot]fnAr\[CenterDot]function)[
-      f\[CenterDot]fn\[CenterDot]function]], F\[CenterDot]cod] &[
-  F\[CenterDot]fnAr\[CenterDot]cod\[CenterDot]object /. 
+ Ar[#, Fn[#\[CenterDot]"object", \
+(F\[CenterDot]"fnAr"\[CenterDot]"function")[
+      f\[CenterDot]"fn"\[CenterDot]"function"]], F\[CenterDot]"cod"] &[
+  F\[CenterDot]"fnAr"\[CenterDot]"cod"\[CenterDot]"object" /. 
    power[A_, B_] :> {B, A}]
-legalQ[F_fr[f_ar]] := FIXME
-(*simplify[A_ob~areIn~B_ob]:=Equal@@({A,B}\[CenterDot]ct)\[And]areIn[\
-A\[CenterDot]object,B\[CenterDot]object]*)
+(*"TODO:FIXME"*)
+legalQ[F_fr[f_ar]] := "FIXME"
+(*simplify[A_ob~areIn~B_ob]:=Equal@@({A,B}\[CenterDot]"ct")\[And]areIn[\
+A\[CenterDot]"object",B\[CenterDot]"object"]*)
 simplify[A_ob \[SubsetEqual] B_ob] := 
- Equal @@ ({A, B}\[CenterDot]ct) \[And] 
-  A\[CenterDot]object \[SubsetEqual] B\[CenterDot]object
+ Equal @@ ({A, B}\[CenterDot]"ct") \[And] 
+  A\[CenterDot]"object" \[SubsetEqual] B\[CenterDot]"object"
 simplify[{xs__} \[SubsetEqual] 
    range : (Integers | Reals | Complexes)] := {xs} \[Element] range
 simplify[{xs__} \[SubsetEqual] region_?RegionQ] := 
