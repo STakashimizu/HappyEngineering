@@ -279,9 +279,13 @@ Fn[{dom_, NA}, function_, opts___Rule] :=
  Module[{x}, 
   Fn[{dom, comprehension[function@x, x \[Element] dom]}, function, 
    opts]]
+(*Fn[{dom_, cod_}, function_, OptionsPattern[]] := 
+ fn@Association["dom" -> dom, "cod" -> cod, "function" -> function, 
+   "label" -> "func"]*)
 Fn[{dom_, cod_}, function_, OptionsPattern[]] := 
  fn@Association["dom" -> dom, "cod" -> cod, "function" -> function, 
-   "label" -> "func"]
+   "label" -> automaticValue[OptionValue@"label", function]]
+
 (*arrow*)
 ar // ClearAll
 (*ar[ass_Association]@"ass":=ass*)
